@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pneumonia Detection</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+    <div class="bg-white p-8 rounded-lg shadow-lg max-w-md w-full">
+        <h1 class="text-2xl font-bold text-center text-gray-800">Pneumonia Detector</h1>
+        <p class="text-gray-600 text-center mb-4">Upload a Chest X-ray image</p>
+        
+        <input type="file" id="imageInput" accept="image/*" class="mb-4 w-full p-2 border rounded-lg">
+
+        <button onclick="uploadImage()" class="w-full bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600">
+            Predict
+        </button>
+
+        <div id="result" class="mt-4 text-center text-lg font-semibold text-gray-800"></div>
+    </div>
+
+    <script>
+        async function uploadImage() {
+    const input = document.getElementById('imageInput');
+    if (input.files.length === 0) {
+        alert('Please select an image first!');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("file", input.files[0]);
+
+    try {
+        const response = await fetch("http://127.0.0.1:8000/predict/", {
+            method: "POST",
+            body: formData
+        });
+
+        if (!response.ok) {
+            throw new Error(`Server error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        document.getElementById('result').innerText = "Prediction: " + (data.prediction || "Error!");
+    
+    } catch (error) {
+        console.error("Error:", error);
+        alert("Failed to process image. Check the console.");
+    }
+}
+
+    </script>
+</body>
+</html>
